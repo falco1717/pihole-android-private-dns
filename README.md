@@ -1,7 +1,7 @@
 # pihole-android-private-dns
 Installs Pihole with DNS over TLS for Android Private DNS
 
-Before starting the script you will want to make sure that port 80,443 and 853 are all forwarded.
+Before starting the script you will want to make sure that port 80, 443 and 853 are all forwarded.
 
 # Download all of the required files
 ```git clone https://github.com/falco1717/pihole-android-private-dns```
