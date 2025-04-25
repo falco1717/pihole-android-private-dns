@@ -29,7 +29,7 @@ EOL
 # Update and install necessary packages without prompts
 sudo apt-get update
 sudo apt install -y software-properties-common lsb-release ca-certificates apt-transport-https
-sudo add-apt-repository ppa:ondrej/php
+yes '' | sudo add-apt-repository ppa:ondrej/php
 sudo apt update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y curl nginx php8.1-fpm php8.1-cgi php8.1-xml php8.1-sqlite3 php8.1-intl apache2-utils certbot python3-certbot-nginx
 
