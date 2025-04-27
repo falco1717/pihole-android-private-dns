@@ -6,12 +6,19 @@ read -p "Enter the network interface for Pi-hole (e.g., eth0): " INTERFACE
 read -s -p "Enter the Pi-hole admin password: " ADMIN_PASSWORD
 echo
 
+# Update
+sudo apt update
+sudo apt upgrade -y
+
 # Set environment variables to avoid prompts during package installation
 export DEBIAN_FRONTEND=noninteractive
 echo '* libraries/restart-without-asking boolean true' | sudo debconf-set-selections
 
 # Create the Pi-hole directory if it doesn't exist
 sudo mkdir -p /etc/pihole
+
+# Install Nginx-full
+Sudo apt install nginx-full
 
 # Create setupVars.conf file with necessary configurations
 sudo tee /etc/pihole/setupVars.conf > /dev/null <<EOL
@@ -42,15 +49,28 @@ if systemctl list-units --type=service | grep -q "lighttpd"; then
     sudo systemctl disable lighttpd
 fi
 
-# Try to obtain SSL certificate with Certbot
-if ! sudo certbot certonly --nginx -d "$DNS_ADDRESS" --agree-tos --register-unsafely-without-email --non-interactive; then
-  echo "WARNING: Certbot failed. Creating self-signed certificate instead."
-  sudo mkdir -p /etc/letsencrypt/live/$DNS_ADDRESS
-  sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-    -keyout /etc/letsencrypt/live/$DNS_ADDRESS/privkey.pem \
-    -out /etc/letsencrypt/live/$DNS_ADDRESS/fullchain.pem \
-    -subj "/CN=$DNS_ADDRESS"
+# Check if credentials.ini exists
+if [ ! -f /opt/pihole/credentials.ini ]; then
+  # Obtain SSL certificate using DNS-01 challenge with Cloudflare DNS plugin
+  read -s -p "Enter your Cloudflare API Key: " CLOUDFLARE_API_Key
+  echo
+  read -s -p "Enter your Cloudflare Email: " CLOUDFLARE_Email
+  echo
+
+  # Create credentials.ini
+  sudo tee /opt/pihole/credentials.ini > /dev/null <<EOL
+dns_cloudflare_api_key = $CLOUDFLARE_API_Key
+dns_cloudflare_email = $CLOUDFLARE_Email
+EOL
+
+  echo "Created /opt/pihole/credentials.ini"
+else
+  echo "/opt/pihole/credentials.ini already exists, skipping credential creation."
 fi
+
+# Run Certbot with DNS-01 challenge
+sudo certbot certonly --dns-cloudflare --dns-cloudflare-credentials /opt/pihole/credentials.ini -d "$DNS_ADDRESS" --agree-tos --non-interactive
+
 
 # Configure Nginx for HTTP and HTTPS
 sudo tee /etc/nginx/sites-available/default > /dev/null <<EOL
