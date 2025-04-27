@@ -39,7 +39,7 @@ sudo apt install -y software-properties-common lsb-release ca-certificates apt-t
 yes '' | sudo add-apt-repository ppa:ondrej/php
 sudo apt update
 sudo apt-get update
-sudo apt-get install -y curl nginx-full php8.1-fpm php8.1-cgi php8.1-xml php8.1-sqlite3 php8.1-intl apache2-utils certbot python3-certbot-nginx
+sudo apt-get install -y curl nginx-full php8.1-fpm php8.1-cgi php8.1-xml php8.1-sqlite3 php8.1-intl apache2-utils certbot python3-certbot-nginx python3-certbot-dns-cloudflare
 
 # Install Pi-hole without user input using setupVars.conf
 curl -sSL https://install.pi-hole.net | bash /dev/stdin --unattended
