@@ -67,6 +67,9 @@ else
   echo "/opt/pihole/credentials.ini already exists, skipping credential creation."
 fi
 
+# Fix permisisons on created file
+sudo chmod -R 755 /opt/pihole/credentials.ini
+
 # Run Certbot with DNS-01 challenge to obtain the certificate
 sudo certbot certonly \
   --dns-cloudflare \
